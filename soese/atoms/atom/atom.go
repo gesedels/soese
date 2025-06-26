@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gesedels/soese/soese/atoms/cell"
+	"github.com/gesedels/soese/soese/atoms/name"
 )
 
 // Atom is a single typed program value.
@@ -23,6 +24,10 @@ type Atom interface {
 func Atomise(text string) (Atom, error) {
 	if cell, err := cell.Parse(text); err == nil {
 		return cell, nil
+	}
+
+	if name, err := name.Parse(text); err == nil {
+		return name, nil
 	}
 
 	return nil, fmt.Errorf("invalid Atom %q", text)

@@ -14,7 +14,7 @@ func New(flot float64) Cell {
 	return Cell(flot)
 }
 
-// Parse returns a new Cell from a string.
+// Parse returns a new Cell from a parsed string.
 func Parse(text string) (Cell, error) {
 	flot, err := strconv.ParseFloat(text, 64)
 	if err != nil {
