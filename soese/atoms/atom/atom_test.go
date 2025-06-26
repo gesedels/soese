@@ -3,12 +3,18 @@ package atom
 import (
 	"testing"
 
+	"github.com/gesedels/soese/soese/atoms/cell"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAtomise(t *testing.T) {
+	// success - Cell
+	atom, err := Atomise("1.234")
+	assert.Equal(t, cell.Cell(1.234), atom)
+	assert.NoError(t, err)
+
 	// error - invalid Atom
-	atom, err := Atomise("")
+	atom, err = Atomise("")
 	assert.Nil(t, atom)
 	assert.EqualError(t, err, `invalid Atom ""`)
 }

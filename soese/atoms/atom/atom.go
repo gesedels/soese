@@ -1,7 +1,11 @@
 // Package atom implements the Atom interface and functions.
 package atom
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/gesedels/soese/soese/atoms/cell"
+)
 
 // Atom is a single typed program value.
 type Atom interface {
@@ -17,8 +21,9 @@ type Atom interface {
 
 // Atomise returns a parsed Atom from a string.
 func Atomise(text string) (Atom, error) {
-	switch {
-	default:
-		return nil, fmt.Errorf("invalid Atom %q", text)
+	if cell, err := cell.Parse(text); err == nil {
+		return cell, nil
 	}
+
+	return nil, fmt.Errorf("invalid Atom %q", text)
 }
