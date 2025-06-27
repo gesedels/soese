@@ -6,22 +6,22 @@ import (
 	"strconv"
 )
 
-// Cell is a single floating-point number.
+// Cell is a single floating-point number Atom.
 type Cell float64
 
 // New returns a new Cell from a float.
-func New(flot float64) Cell {
-	return Cell(flot)
+func New(f float64) Cell {
+	return Cell(f)
 }
 
 // Parse returns a new Cell from a parsed string.
-func Parse(text string) (Cell, error) {
-	flot, err := strconv.ParseFloat(text, 64)
+func Parse(s string) (Cell, error) {
+	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0, fmt.Errorf("invalid Cell %q", text)
+		return 0, fmt.Errorf("invalid Cell %q", s)
 	}
 
-	return New(flot), nil
+	return New(f), nil
 }
 
 // Bool returns the Cell as a boolean.

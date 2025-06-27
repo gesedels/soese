@@ -10,17 +10,17 @@ import (
 
 func TestAtomise(t *testing.T) {
 	// success - Cell
-	atom, err := Atomise("1.234")
-	assert.Equal(t, cell.Cell(1.234), atom)
+	a, err := Atomise("1.234")
+	assert.Equal(t, cell.Cell(1.234), a)
 	assert.NoError(t, err)
 
 	// success - Name
-	atom, err = Atomise("name")
-	assert.Equal(t, name.Name("name"), atom)
+	a, err = Atomise("name")
+	assert.Equal(t, name.Name("name"), a)
 	assert.NoError(t, err)
 
 	// error - invalid Atom
-	atom, err = Atomise("")
-	assert.Nil(t, atom)
+	a, err = Atomise("")
+	assert.Nil(t, a)
 	assert.EqualError(t, err, `invalid Atom ""`)
 }

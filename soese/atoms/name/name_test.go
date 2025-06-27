@@ -8,40 +8,40 @@ import (
 
 func TestNew(t *testing.T) {
 	// success
-	name := New("NAME")
-	assert.Equal(t, Name("name"), name)
+	n := New("NAME")
+	assert.Equal(t, Name("name"), n)
 }
 
 func TestParse(t *testing.T) {
 	// success
-	name, err := Parse("\tname\n")
-	assert.Equal(t, Name("name"), name)
+	n, err := Parse("\tname\n")
+	assert.Equal(t, Name("name"), n)
 	assert.NoError(t, err)
 
 	// error - invalid Name
-	name, err = Parse("\n")
-	assert.Empty(t, name)
+	n, err = Parse("\n")
+	assert.Empty(t, n)
 	assert.EqualError(t, err, `invalid Name ""`)
 }
 
 func TestBool(t *testing.T) {
 	// success - true
-	okay := Name("name").Bool()
-	assert.True(t, okay)
+	b := Name("name").Bool()
+	assert.True(t, b)
 
 	// success - false
-	okay = Name("").Bool()
-	assert.False(t, okay)
+	b = Name("").Bool()
+	assert.False(t, b)
 }
 
 func TestNative(t *testing.T) {
 	// success
-	text := Name("name").Native()
-	assert.Equal(t, "name", text)
+	s := Name("name").Native()
+	assert.Equal(t, "name", s)
 }
 
 func TestString(t *testing.T) {
 	// success
-	text := Name("name").String()
-	assert.Equal(t, "name", text)
+	s := Name("name").String()
+	assert.Equal(t, "name", s)
 }

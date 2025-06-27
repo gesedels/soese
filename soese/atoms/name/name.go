@@ -6,22 +6,22 @@ import (
 	"strings"
 )
 
-// Name is a single value reference string.
+// Name is a single reference string Atom.
 type Name string
 
 // New returns a new Name from a string.
-func New(text string) Name {
-	return Name(strings.ToLower(text))
+func New(s string) Name {
+	return Name(strings.ToLower(s))
 }
 
 // Parse returns a new Name from a parsed string.
-func Parse(text string) (Name, error) {
-	text = strings.TrimSpace(text)
-	if text == "" {
-		return "", fmt.Errorf("invalid Name %q", text)
+func Parse(s string) (Name, error) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return "", fmt.Errorf("invalid Name %q", s)
 	}
 
-	return New(text), nil
+	return New(s), nil
 }
 
 // Bool returns the Name as a boolean.

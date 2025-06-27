@@ -20,15 +20,15 @@ type Atom interface {
 	String() string
 }
 
-// Atomise returns a parsed Atom from a string.
-func Atomise(text string) (Atom, error) {
-	if cell, err := cell.Parse(text); err == nil {
-		return cell, nil
+// Atomise returns a new Atom from a parsed string.
+func Atomise(s string) (Atom, error) {
+	if a, err := cell.Parse(s); err == nil {
+		return a, nil
 	}
 
-	if name, err := name.Parse(text); err == nil {
-		return name, nil
+	if a, err := name.Parse(s); err == nil {
+		return a, nil
 	}
 
-	return nil, fmt.Errorf("invalid Atom %q", text)
+	return nil, fmt.Errorf("invalid Atom %q", s)
 }

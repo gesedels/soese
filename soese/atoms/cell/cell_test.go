@@ -8,44 +8,44 @@ import (
 
 func TestNew(t *testing.T) {
 	// success
-	cell := New(1.234)
-	assert.Equal(t, Cell(1.234), cell)
+	c := New(1.234)
+	assert.Equal(t, Cell(1.234), c)
 }
 
 func TestParse(t *testing.T) {
 	// success
-	cell, err := Parse("1.234")
-	assert.Equal(t, Cell(1.234), cell)
+	c, err := Parse("1.234")
+	assert.Equal(t, Cell(1.234), c)
 	assert.NoError(t, err)
 
 	// error - invalid Cell
-	cell, err = Parse("")
-	assert.Zero(t, cell)
+	c, err = Parse("")
+	assert.Zero(t, c)
 	assert.EqualError(t, err, `invalid Cell ""`)
 }
 
 func TestBool(t *testing.T) {
 	// success - true
-	okay := Cell(1.234).Bool()
-	assert.True(t, okay)
+	b := Cell(1.234).Bool()
+	assert.True(t, b)
 
 	// success - false
-	okay = Cell(0).Bool()
-	assert.False(t, okay)
+	b = Cell(0).Bool()
+	assert.False(t, b)
 }
 
 func TestNative(t *testing.T) {
 	// success
-	flot := Cell(1.234).Native()
-	assert.Equal(t, float64(1.234), flot)
+	f := Cell(1.234).Native()
+	assert.Equal(t, float64(1.234), f)
 }
 
 func TestString(t *testing.T) {
 	// success - no decimals
-	text := Cell(1).String()
-	assert.Equal(t, "1", text)
+	s := Cell(1).String()
+	assert.Equal(t, "1", s)
 
 	// success - with decimals
-	text = Cell(1.234).String()
-	assert.Equal(t, "1.234", text)
+	s = Cell(1.234).String()
+	assert.Equal(t, "1.234", s)
 }
