@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/gesedels/soese/soese/langs/queue"
-	"github.com/gesedels/soese/soese/langs/stack"
+	"github.com/gesedels/soese/soese/types/queue"
+	"github.com/gesedels/soese/soese/types/stack"
 )
 
 // Frame is a top-level program container and controller.

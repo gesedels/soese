@@ -7,8 +7,8 @@ import (
 	"github.com/gesedels/soese/soese/atoms/atom"
 	"github.com/gesedels/soese/soese/atoms/cell"
 	"github.com/gesedels/soese/soese/atoms/name"
-	"github.com/gesedels/soese/soese/langs/queue"
-	"github.com/gesedels/soese/soese/langs/stack"
+	"github.com/gesedels/soese/soese/types/queue"
+	"github.com/gesedels/soese/soese/types/stack"
 	"github.com/stretchr/testify/assert"
 )
 
