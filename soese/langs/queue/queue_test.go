@@ -29,7 +29,7 @@ func TestDequeue(t *testing.T) {
 	// error - Queue is empty
 	a, err = q.Dequeue()
 	assert.Nil(t, a)
-	assert.EqualError(t, err, "Queue is empty")
+	assert.EqualError(t, err, "queue is empty")
 }
 
 func TestDequeueSlice(t *testing.T) {
@@ -45,7 +45,7 @@ func TestDequeueSlice(t *testing.T) {
 	// error - Queue is empty
 	as, err = q.DequeueSlice(1)
 	assert.Empty(t, as)
-	assert.EqualError(t, err, "Queue is insufficient")
+	assert.EqualError(t, err, "queue is insufficient")
 }
 
 func TestEmpty(t *testing.T) {

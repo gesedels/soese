@@ -42,7 +42,7 @@ func TestPop(t *testing.T) {
 	// error - Stack is empty
 	c, err = s.Pop()
 	assert.Zero(t, c)
-	assert.EqualError(t, err, "Stack is empty")
+	assert.EqualError(t, err, "stack is empty")
 }
 
 func TestPopSlice(t *testing.T) {
@@ -58,7 +58,7 @@ func TestPopSlice(t *testing.T) {
 	// error - Stack has fewer Cells
 	cells, err = s.PopSlice(1)
 	assert.Empty(t, cells)
-	assert.EqualError(t, err, "Stack is insufficient")
+	assert.EqualError(t, err, "stack is insufficient")
 }
 
 func TestPush(t *testing.T) {

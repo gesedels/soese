@@ -22,5 +22,5 @@ func TestAtomise(t *testing.T) {
 	// error - invalid Atom
 	a, err = Atomise("")
 	assert.Nil(t, a)
-	assert.EqualError(t, err, `invalid Atom ""`)
+	assert.EqualError(t, err, `invalid atom ""`)
 }

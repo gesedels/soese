@@ -21,7 +21,7 @@ func TestParse(t *testing.T) {
 	// error - invalid Name
 	n, err = Parse("\n")
 	assert.Empty(t, n)
-	assert.EqualError(t, err, `invalid Name ""`)
+	assert.EqualError(t, err, `invalid name ""`)
 }
 
 func TestBool(t *testing.T) {

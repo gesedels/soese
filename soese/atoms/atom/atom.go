@@ -30,5 +30,5 @@ func Atomise(s string) (Atom, error) {
 		return a, nil
 	}
 
-	return nil, fmt.Errorf("invalid Atom %q", s)
+	return nil, fmt.Errorf("invalid atom %q", s)
 }

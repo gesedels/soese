@@ -18,7 +18,7 @@ func New(f float64) Cell {
 func Parse(s string) (Cell, error) {
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0, fmt.Errorf("invalid Cell %q", s)
+		return 0, fmt.Errorf("invalid cell %q", s)
 	}
 
 	return New(f), nil

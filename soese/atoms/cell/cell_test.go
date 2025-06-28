@@ -21,7 +21,7 @@ func TestParse(t *testing.T) {
 	// error - invalid Cell
 	c, err = Parse("")
 	assert.Zero(t, c)
-	assert.EqualError(t, err, `invalid Cell ""`)
+	assert.EqualError(t, err, `invalid cell ""`)
 }
 
 func TestBool(t *testing.T) {

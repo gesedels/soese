@@ -32,7 +32,7 @@ func (s *Stack) Len() int {
 // Pop removes and returns the top Cell on the Stack
 func (s *Stack) Pop() (cell.Cell, error) {
 	if len(s.Cells) == 0 {
-		return 0, fmt.Errorf("Stack is empty")
+		return 0, fmt.Errorf("stack is empty")
 	}
 
 	c := s.Cells[len(s.Cells)-1]
@@ -43,7 +43,7 @@ func (s *Stack) Pop() (cell.Cell, error) {
 // PopSlice removes and returns the top n Cells on the Stack.
 func (s *Stack) PopSlice(n int) ([]cell.Cell, error) {
 	if len(s.Cells) < n {
-		return nil, fmt.Errorf("Stack is insufficient")
+		return nil, fmt.Errorf("stack is insufficient")
 	}
 
 	cs := s.Cells[len(s.Cells)-n:]

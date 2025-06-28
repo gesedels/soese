@@ -18,7 +18,7 @@ func New(s string) Name {
 func Parse(s string) (Name, error) {
 	s = strings.TrimSpace(s)
 	if s == "" {
-		return "", fmt.Errorf("invalid Name %q", s)
+		return "", fmt.Errorf("invalid name %q", s)
 	}
 
 	return New(s), nil

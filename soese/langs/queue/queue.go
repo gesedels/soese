@@ -20,7 +20,7 @@ func New(as ...atom.Atom) *Queue {
 // Dequeue removes and returns the first Atom in the Queue.
 func (q *Queue) Dequeue() (atom.Atom, error) {
 	if len(q.Atoms) == 0 {
-		return nil, fmt.Errorf("Queue is empty")
+		return nil, fmt.Errorf("queue is empty")
 	}
 
 	a := q.Atoms[0]
@@ -31,7 +31,7 @@ func (q *Queue) Dequeue() (atom.Atom, error) {
 // DequeueSlice removes and returns the first n Atoms in the Queue.
 func (q *Queue) DequeueSlice(n int) ([]atom.Atom, error) {
 	if len(q.Atoms) < n {
-		return nil, fmt.Errorf("Queue is insufficient")
+		return nil, fmt.Errorf("queue is insufficient")
 	}
 
 	as := q.Atoms[:n]
