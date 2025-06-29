@@ -1,6 +1,6 @@
 # Soese
 
-**Soese** (*Stephen's Over-Engineered Stack Engine*) is an experimental stack language interpreter, written by [Stephen Malone][sm] in [Go 1.24][go].
+**Soese** (*Stephen's Over-Engineered Scheme Engine*) is an experimental Scheme-like language interpreter, written by [Stephen Malone][sm] in [Go 1.24][go].
 
 - See [`changes.md`][ch] for the complete changelog.
 - See [`license.md`][li] for the open-source license (BSD-3).
