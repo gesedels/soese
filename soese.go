@@ -1,3 +1,7 @@
+///////////////////////////////////////////////////////////////////////////////////////
+//              soese · stephen's over-engineered scheme engine · v0.0.0             //
+///////////////////////////////////////////////////////////////////////////////////////
+
 package main
 
 import (
@@ -9,6 +13,12 @@ import (
 	"strings"
 )
 
+///////////////////////////////////////////////////////////////////////////////////////
+//                                                                                   //
+//                                      old code                                     //
+//                                                                                   //
+///////////////////////////////////////////////////////////////////////////////////////
+
 // =================================================================
 // DATA STRUCTURES & TYPES
 // =================================================================
@@ -16,30 +26,30 @@ import (
 // We use type aliases for clarity.
 type Symbol string
 type Number int64
-type List []interface{}
+type List []any
 
 // Proc is a built-in procedure implemented in Go.
 // It receives its arguments already evaluated.
-type Proc func(args List) (interface{}, error)
+type Proc func(args List) (any, error)
 
 // SpecialForm is a built-in procedure that does NOT have its arguments
 // evaluated before being called. It's responsible for its own evaluation logic.
 // Examples: if, define, lambda.
-type SpecialForm func(args List, env *Env) (interface{}, error)
+type SpecialForm func(args List, env *Env) (any, error)
 
 // A Procedure represents a user-defined lambda. It captures the
 // parameters, the function body, and the environment (closure)
 // in which it was created.
 type Procedure struct {
 	params []string
-	body   interface{}
+	body   any
 	env    *Env
 }
 
 // Env represents our environment, mapping symbols (strings) to values.
 // It includes a reference to an outer environment to allow for lexical scoping.
 type Env struct {
-	store map[string]interface{}
+	store map[string]any
 	outer *Env
 }
 
@@ -50,7 +60,7 @@ type Env struct {
 // NewEnv creates a new environment, optionally extending an outer one.
 func NewEnv(outer *Env) *Env {
 	return &Env{
-		store: make(map[string]interface{}),
+		store: make(map[string]any),
 		outer: outer,
 	}
 }
@@ -68,7 +78,7 @@ func (e *Env) Find(key string) *Env {
 }
 
 // Get retrieves a value for a key from the environment chain.
-func (e *Env) Get(key string) (interface{}, bool) {
+func (e *Env) Get(key string) (any, bool) {
 	env := e.Find(key)
 	if env == nil {
 		return nil, false
@@ -78,7 +88,7 @@ func (e *Env) Get(key string) (interface{}, bool) {
 }
 
 // Set adds a new key-value pair to the current environment's store.
-func (e *Env) Set(key string, val interface{}) {
+func (e *Env) Set(key string, val any) {
 	e.store[key] = val
 }
 
@@ -93,7 +103,7 @@ func tokenize(input string) []string {
 }
 
 // parseAtom attempts to convert a single token into an atom (Number or Symbol).
-func parseAtom(token string) interface{} {
+func parseAtom(token string) any {
 	if val, err := strconv.ParseInt(token, 10, 64); err == nil {
 		return Number(val)
 	}
@@ -101,7 +111,7 @@ func parseAtom(token string) interface{} {
 }
 
 // readFromTokens recursively builds an abstract syntax tree (AST).
-func readFromTokens(tokens []string) (interface{}, []string, error) {
+func readFromTokens(tokens []string) (any, []string, error) {
 	if len(tokens) == 0 {
 		return nil, nil, fmt.Errorf("syntax error: unexpected EOF")
 	}
@@ -131,7 +141,7 @@ func readFromTokens(tokens []string) (interface{}, []string, error) {
 }
 
 // Parse orchestrates the tokenizing and parsing process.
-func Parse(input string) (interface{}, error) {
+func Parse(input string) (any, error) {
 	tokens := tokenize(input)
 	ast, remaining, err := readFromTokens(tokens)
 	if err != nil {
@@ -149,7 +159,7 @@ func Parse(input string) (interface{}, error) {
 
 // Eval is the core of the interpreter. It evaluates an expression in a given environment.
 // It is now fully recursive, replacing the previous tail-call-optimized loop.
-func Eval(exp interface{}, env *Env) (interface{}, error) {
+func Eval(exp any, env *Env) (any, error) {
 	switch e := exp.(type) {
 	case Symbol:
 		// Look up the symbol in the environment.
@@ -204,7 +214,7 @@ func Eval(exp interface{}, env *Env) (interface{}, error) {
 }
 
 // apply handles the logic of calling a procedure (built-in or user-defined).
-func apply(proc interface{}, args List) (interface{}, error) {
+func apply(proc any, args List) (any, error) {
 	switch p := proc.(type) {
 	case Proc:
 		// It's a built-in Go function.
@@ -237,7 +247,7 @@ func createGlobalEnv() *Env {
 
 	// --- Special Forms ---
 
-	env.Set("if", SpecialForm(func(args List, env *Env) (interface{}, error) {
+	env.Set("if", SpecialForm(func(args List, env *Env) (any, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("syntax error: 'if' requires 2 or 3 arguments")
 		}
@@ -261,7 +271,7 @@ func createGlobalEnv() *Env {
 		return Eval(args[1], env) // Eval then-expression
 	}))
 
-	env.Set("define", SpecialForm(func(args List, env *Env) (interface{}, error) {
+	env.Set("define", SpecialForm(func(args List, env *Env) (any, error) {
 		if len(args) < 2 {
 			return nil, fmt.Errorf("syntax error: 'define' requires at least 2 arguments")
 		}
@@ -301,7 +311,7 @@ func createGlobalEnv() *Env {
 		return nil, nil // 'define' returns an unspecified value
 	}))
 
-	env.Set("lambda", SpecialForm(func(args List, env *Env) (interface{}, error) {
+	env.Set("lambda", SpecialForm(func(args List, env *Env) (any, error) {
 		if len(args) != 2 {
 			return nil, fmt.Errorf("syntax error: lambda requires 2 arguments (params and body)")
 		}
@@ -323,7 +333,7 @@ func createGlobalEnv() *Env {
 
 	// --- Regular Procedures ---
 
-	env.Set("+", Proc(func(args List) (interface{}, error) {
+	env.Set("+", Proc(func(args List) (any, error) {
 		sum := Number(0)
 		for _, arg := range args {
 			n, ok := arg.(Number)
@@ -335,7 +345,7 @@ func createGlobalEnv() *Env {
 		return sum, nil
 	}))
 
-	env.Set("print", Proc(func(args List) (interface{}, error) {
+	env.Set("print", Proc(func(args List) (any, error) {
 		var parts []string
 		for _, arg := range args {
 			parts = append(parts, stringify(arg))
@@ -348,7 +358,7 @@ func createGlobalEnv() *Env {
 }
 
 // stringify converts an evaluated expression back into a readable string.
-func stringify(exp interface{}) string {
+func stringify(exp any) string {
 	if exp == nil {
 		return ""
 	}
