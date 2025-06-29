@@ -14,6 +14,37 @@ import (
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////
+//                         part one · global type definitions                        //
+///////////////////////////////////////////////////////////////////////////////////////
+
+// 1.1: the Atom interface
+///////////////////////////
+
+// Atom is an interface for typed program values.
+type Atom any
+
+// 1.2: Atom value types
+/////////////////////////
+
+// Cell is a 64-bit integer value.
+type Cell int64
+
+// Name is a string reference value.
+type Name string
+
+// Sexp is a sequence of zero or more Atoms.
+type Sexp []Atom
+
+// 1.3: Atom function types
+////////////////////////////
+
+// Flow is a built-in function that evaluates its own arguments.
+type Flow func(Sexp, *Env) (Atom, error)
+
+// Proc is a built-in function that accepts pre-evaluated arguments.
+type Proc func(Sexp) (Atom, error)
+
+///////////////////////////////////////////////////////////////////////////////////////
 //                                                                                   //
 //                                      old code                                     //
 //                                                                                   //
@@ -22,20 +53,6 @@ import (
 // =================================================================
 // DATA STRUCTURES & TYPES
 // =================================================================
-
-// We use type aliases for clarity.
-type Symbol string
-type Number int64
-type List []any
-
-// Proc is a built-in procedure implemented in Go.
-// It receives its arguments already evaluated.
-type Proc func(args List) (any, error)
-
-// SpecialForm is a built-in procedure that does NOT have its arguments
-// evaluated before being called. It's responsible for its own evaluation logic.
-// Examples: if, define, lambda.
-type SpecialForm func(args List, env *Env) (any, error)
 
 // A Procedure represents a user-defined lambda. It captures the
 // parameters, the function body, and the environment (closure)
@@ -105,9 +122,9 @@ func tokenize(input string) []string {
 // parseAtom attempts to convert a single token into an atom (Number or Symbol).
 func parseAtom(token string) any {
 	if val, err := strconv.ParseInt(token, 10, 64); err == nil {
-		return Number(val)
+		return Cell(val)
 	}
-	return Symbol(token)
+	return Name(token)
 }
 
 // readFromTokens recursively builds an abstract syntax tree (AST).
@@ -120,7 +137,7 @@ func readFromTokens(tokens []string) (any, []string, error) {
 
 	switch token {
 	case "(":
-		var list List
+		var list Sexp
 		for len(tokens) > 0 && tokens[0] != ")" {
 			expr, rest, err := readFromTokens(tokens)
 			if err != nil {
@@ -161,17 +178,17 @@ func Parse(input string) (any, error) {
 // It is now fully recursive, replacing the previous tail-call-optimized loop.
 func Eval(exp any, env *Env) (any, error) {
 	switch e := exp.(type) {
-	case Symbol:
+	case Name:
 		// Look up the symbol in the environment.
 		val, ok := env.Get(string(e))
 		if !ok {
 			return nil, fmt.Errorf("error: undefined symbol '%s'", e)
 		}
 		return val, nil
-	case Number:
+	case Cell:
 		// Numbers evaluate to themselves.
 		return e, nil
-	case List:
+	case Sexp:
 		// An empty list is an error.
 		if len(e) == 0 {
 			return nil, fmt.Errorf("error: empty list cannot be evaluated")
@@ -182,9 +199,9 @@ func Eval(exp any, env *Env) (any, error) {
 
 		// Check if the expression is a call to a special form.
 		// Special forms are looked up by symbol but are not evaluated like regular procedures.
-		if sym, ok := first.(Symbol); ok {
+		if sym, ok := first.(Name); ok {
 			if proc, ok := env.Get(string(sym)); ok {
-				if sf, ok := proc.(SpecialForm); ok {
+				if sf, ok := proc.(Flow); ok {
 					return sf(args, env)
 				}
 			}
@@ -197,7 +214,7 @@ func Eval(exp any, env *Env) (any, error) {
 		}
 
 		// Then, evaluate all arguments.
-		evaledArgs := List{}
+		evaledArgs := Sexp{}
 		for _, arg := range args {
 			val, err := Eval(arg, env)
 			if err != nil {
@@ -214,7 +231,7 @@ func Eval(exp any, env *Env) (any, error) {
 }
 
 // apply handles the logic of calling a procedure (built-in or user-defined).
-func apply(proc any, args List) (any, error) {
+func apply(proc any, args Sexp) (any, error) {
 	switch p := proc.(type) {
 	case Proc:
 		// It's a built-in Go function.
@@ -247,7 +264,7 @@ func createGlobalEnv() *Env {
 
 	// --- Special Forms ---
 
-	env.Set("if", SpecialForm(func(args List, env *Env) (any, error) {
+	env.Set("if", Flow(func(args Sexp, env *Env) (Atom, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("syntax error: 'if' requires 2 or 3 arguments")
 		}
@@ -271,22 +288,22 @@ func createGlobalEnv() *Env {
 		return Eval(args[1], env) // Eval then-expression
 	}))
 
-	env.Set("define", SpecialForm(func(args List, env *Env) (any, error) {
+	env.Set("define", Flow(func(args Sexp, env *Env) (Atom, error) {
 		if len(args) < 2 {
 			return nil, fmt.Errorf("syntax error: 'define' requires at least 2 arguments")
 		}
 
 		// Handle function shorthand: (define (f x) body)
-		if def, ok := args[0].(List); ok {
+		if def, ok := args[0].(Sexp); ok {
 			if len(def) == 0 {
 				return nil, fmt.Errorf("syntax error: invalid function definition")
 			}
-			funcName, ok := def[0].(Symbol)
+			funcName, ok := def[0].(Name)
 			if !ok {
 				return nil, fmt.Errorf("syntax error: function name must be a symbol")
 			}
 			// Desugar into (define f (lambda (params...) body))
-			lambdaExp := List{Symbol("lambda"), def[1:], args[1]}
+			lambdaExp := Sexp{Name("lambda"), def[1:], args[1]}
 			proc, err := Eval(lambdaExp, env) // Eval the created lambda
 			if err != nil {
 				return nil, err
@@ -296,7 +313,7 @@ func createGlobalEnv() *Env {
 		}
 
 		// Handle variable definition: (define var val)
-		sym, ok := args[0].(Symbol)
+		sym, ok := args[0].(Name)
 		if !ok {
 			return nil, fmt.Errorf("syntax error: 'define' key must be a symbol")
 		}
@@ -311,17 +328,17 @@ func createGlobalEnv() *Env {
 		return nil, nil // 'define' returns an unspecified value
 	}))
 
-	env.Set("lambda", SpecialForm(func(args List, env *Env) (any, error) {
+	env.Set("lambda", Flow(func(args Sexp, env *Env) (Atom, error) {
 		if len(args) != 2 {
 			return nil, fmt.Errorf("syntax error: lambda requires 2 arguments (params and body)")
 		}
-		paramsRaw, ok := args[0].(List)
+		paramsRaw, ok := args[0].(Sexp)
 		if !ok {
 			return nil, fmt.Errorf("syntax error: lambda parameters must be a list")
 		}
 		var params []string
 		for _, p := range paramsRaw {
-			if ps, ok := p.(Symbol); ok {
+			if ps, ok := p.(Name); ok {
 				params = append(params, string(ps))
 			} else {
 				return nil, fmt.Errorf("syntax error: lambda parameters must be symbols")
@@ -333,10 +350,10 @@ func createGlobalEnv() *Env {
 
 	// --- Regular Procedures ---
 
-	env.Set("+", Proc(func(args List) (any, error) {
-		sum := Number(0)
+	env.Set("+", Proc(func(args Sexp) (Atom, error) {
+		sum := Cell(0)
 		for _, arg := range args {
-			n, ok := arg.(Number)
+			n, ok := arg.(Cell)
 			if !ok {
 				return nil, fmt.Errorf("type error: '+' expects numbers, got %T", arg)
 			}
@@ -345,7 +362,7 @@ func createGlobalEnv() *Env {
 		return sum, nil
 	}))
 
-	env.Set("print", Proc(func(args List) (any, error) {
+	env.Set("print", Proc(func(args Sexp) (Atom, error) {
 		var parts []string
 		for _, arg := range args {
 			parts = append(parts, stringify(arg))
@@ -363,11 +380,11 @@ func stringify(exp any) string {
 		return ""
 	}
 	switch e := exp.(type) {
-	case Number:
+	case Cell:
 		return fmt.Sprintf("%d", e)
-	case Symbol:
+	case Name:
 		return string(e)
-	case List:
+	case Sexp:
 		var parts []string
 		for _, item := range e {
 			parts = append(parts, stringify(item))
@@ -375,7 +392,7 @@ func stringify(exp any) string {
 		return "(" + strings.Join(parts, " ") + ")"
 	case Procedure:
 		return "<procedure>"
-	case SpecialForm:
+	case Flow:
 		return "<special-form>"
 	default:
 		return fmt.Sprintf("%v", e)
